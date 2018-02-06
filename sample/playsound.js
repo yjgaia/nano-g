@@ -1,0 +1,1 @@
+play('sample/sound.mp3');

@@ -35,6 +35,7 @@
 	};
 	
 	let images = {};
+	let audios = {};
 	
 	// 무언가를 그린다.
 	global.draw = (target, option) => {
@@ -126,12 +127,19 @@
 	
 	// 무언가를 재생시킨다.
 	global.play = (src, option) => {
-		
+		if (audios[src] === undefined) {
+			audios[src] = new Audio();
+		}
+		audios[src].src = src;
+		audios[src].play();
 	};
 	
 	// 무언가의 재생을 멈춘다.
 	global.stop = (src) => {
-		
+		if (audios[src] !== undefined) {
+			audios[src].pause();
+			audios[src].currentTime = 0;
+		}
 	};
 	
 	// 충돌을 체크한다.
