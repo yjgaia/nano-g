@@ -1,1 +1,3 @@
-draw('Hello World.');
+g(() => {
+	draw('Hello World.', {size: 30});
+});

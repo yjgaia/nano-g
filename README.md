@@ -26,8 +26,8 @@ draw('circle', {width: 30, height: 30, x: -100, y: 300});
 - `y`
 - `width`
 - `height`
-- `size` 텍스트 크기
-- `font` 텍스트의 폰트 이름
+- `size` 텍스트 크기 (필수)
+- `font` 텍스트 폰트 이름
 - `color`
 - `alpha`
 - `angle`
@@ -84,3 +84,9 @@ draw('circle', {width: 30, height: 30, x: -100, y: 300});
 * `delta_time` 델타 타임
 * `window_width` 창의 너비
 * `window_height` 창의 높이
+
+## 라이센스
+[MIT](LICENSE)
+
+## 작성자
+[Young Jae Sim](https://github.com/Hanul)
