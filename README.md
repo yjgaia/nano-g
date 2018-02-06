@@ -81,6 +81,6 @@ draw('circle', {width: 30, height: 30, x: -100, y: 300});
 대상으로는 메시지를 입력한다.
 
 ## 변수
+* `delta_time` 델타 타임
 * `window_width` 창의 너비
 * `window_height` 창의 높이
-* `delta_time` 델타 타임
