@@ -27,7 +27,8 @@ draw('circle', {width: 30, height: 30, x: -100, y: 300});
 - `y`
 - `width`
 - `height`
-- `size` 텍스트의 경우 텍스트 크기
+- `size` 텍스트 크기
+- `font` 텍스트의 폰트 이름
 
 ## `play`
 무언가를 재생시킨다.
