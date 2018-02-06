@@ -16,9 +16,8 @@ draw('circle', {width: 30, height: 30, x: -100, y: 300});
 무언가를 그린다.
 
 다음과 같은 대상들을 가진다.
-- `rect`
-- `circle`
-- `polygon`
+- `'rect'`
+- `'circle'`
 - 이미지 파일 경로
 - 텍스트
 
@@ -29,6 +28,9 @@ draw('circle', {width: 30, height: 30, x: -100, y: 300});
 - `height`
 - `size` 텍스트 크기
 - `font` 텍스트의 폰트 이름
+- `color`
+- `alpha`
+- `angle`
 
 ## `play`
 무언가를 재생시킨다.
@@ -44,12 +46,33 @@ draw('circle', {width: 30, height: 30, x: -100, y: 300});
 
 대상으로는 파일 경로를 입력한다.
 
+## `check_collision`
+충돌을 체크한다.
+
+다음과 같은 대상들을 가진다.
+- `'rect_rect'`
+- `'circle_circle'`
+- `'rect_circle'`
+- `'circle_rect'`
+
+다음과 같은 옵션들을 가진다.
+- `x1`
+- `y1`
+- `width1`
+- `height1`
+- `angle1`
+- `x2`
+- `y2`
+- `width2`
+- `height2`
+- `angle2`
+
 ## `check_input`
 게임으로의 입력을 체크한다.
 
 다음과 같은 대상들을 가진다.
-- `mouse_left` 마우스 왼클릭
-- `mouse_right` 마우스 오른클릭
+- `'mouse_left'` 마우스 왼클릭
+- `'mouse_right'` 마우스 오른클릭
 - 키보드 키 값
 
 ## `log`
