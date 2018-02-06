@@ -144,11 +144,6 @@
 		
 	};
 	
-	// 개발자 도구의 콘솔에 메시지를 출력한다.
-	global.log = (msg) => {
-		console.log(msg);
-	};
-	
 	// 프레임마다 실행
 	let beforeTime = performance.now() / 1000;
 	let step;

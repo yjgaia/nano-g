@@ -99,11 +99,6 @@ draw('circle', {width: 30, height: 30, x: -100, y: 300});
 - `'mouse_right'` 마우스 오른클릭
 - 키보드 키 값
 
-## `log`
-개발자 도구의 콘솔에 메시지를 출력한다.
-
-대상으로는 메시지를 입력한다.
-
 ## 변수
 * `delta_time` 델타 타임
 * `window_width` 창의 너비
