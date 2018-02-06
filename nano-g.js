@@ -20,6 +20,13 @@
 	
 	document.body.appendChild(canvas);
 	
+	global.addEventListener('resize', () => {
+		global.window_width = document.documentElement.clientWidth;
+		global.window_height = global.innerHeight;
+		canvas.width = window_width;
+		canvas.height = window_height;
+	}, false);
+	
 	let logics = [];
 	
 	// 게임 로직 등록

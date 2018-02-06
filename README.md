@@ -1,6 +1,30 @@
 # nano-g
 초심플 게임개발
 
+###### index.html
+```html
+<!doctype html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+		<title>nano-g sample</title>
+		<link rel="stylesheet" href="style.css">
+	</head>
+	<body>
+		<script src="nano-g.js"></script>
+		<script src="game.js"></script>
+	</body>
+</html>
+```
+
+###### game.js
+```javascript
+g(() => {
+	draw('Hello World.', {size: 30});
+});
+```
+
 ## 명령어
 모든 명령어의 형태는 다음과 같다.
 
