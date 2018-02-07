@@ -103,6 +103,8 @@ draw('circle', {width: 30, height: 30, x: -100, y: 300});
 * `delta_time` 델타 타임
 * `window_width` 창의 너비
 * `window_height` 창의 높이
+* `mouse_x` 마우스 커서의 x 좌표 
+* `mouse_y` 마우스 커서의 y 좌표 
 
 ## 라이센스
 [MIT](LICENSE)
