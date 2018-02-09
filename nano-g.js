@@ -49,12 +49,12 @@
 		isMouseDown = false;
 	}, false);
 	
-	let key;
+	let keyDowns = {};
 	global.addEventListener('keydown', (e) => {
-		key = e.key.toLowerCase();
+		keyDowns[e.key.toLowerCase()] = true;
 	}, false);
 	global.addEventListener('keyup', (e) => {
-		key = undefined;
+		delete keyDowns[e.key.toLowerCase()];
 	}, false);
 	
 	let logics = [];
@@ -74,6 +74,8 @@
 		let y;
 		let width;
 		let height;
+		let flip_x;
+		let flip_y;
 		let color;
 		let alpha;
 		let angle;
@@ -84,6 +86,8 @@
 			y = option.y;
 			width = option.width;
 			height = option.height;
+			flip_x = option.flip_x;
+			flip_y = option.flip_y;
 			color = option.color;
 			alpha = option.alpha;
 			angle = option.angle;
@@ -96,7 +100,7 @@
 			y = 0;
 		}
 		if (color === undefined) {
-			color = '#ffffff';
+			color = '#000000';
 		}
 		if (alpha === undefined) {
 			alpha = 1;
@@ -110,6 +114,10 @@
 		context.translate(x, y);
 		context.rotate(angle * Math.PI / 180);
 		context.globalAlpha = alpha;
+		
+		if (flip_x === true || flip_y === true) {
+			context.scale(flip_x === true ? -1 : 1, flip_y === true ? -1 : 1);
+		}
 		
 		// 사각형
 		if (target === 'rect') {
@@ -145,7 +153,7 @@
 		
 		// 텍스트
 		else {
-			context.font = option.size + 'px ' + (option.font === undefined ? 'Arial' : option.font);
+			context.font = (option.style === undefined ? '' : option.style + ' ') + option.size + 'px ' + (option.font === undefined ? 'Arial' : option.font);
 			context.fillStyle = color;
 			context.textAlign = 'center';
 			context.textBaseline = 'middle';
@@ -161,6 +169,14 @@
 			audios[src] = new Audio();
 		}
 		audios[src].src = src;
+		if (option !== undefined) {
+			if (option.loop !== undefined) {
+				audios[src].loop = option.loop;
+			}
+			if (option.volume !== undefined) {
+				audios[src].volume = option.volume;
+			}
+		}
 		audios[src].play();
 	};
 	
@@ -273,8 +289,8 @@
 	global.check_input = (target) => {
 		if (target === 'mouse' && isMouseDown === true) {
 			return true;
-		} else if (target === key) {
-			return true;
+		} else {
+			return keyDowns[target];
 		}
 	};
 	

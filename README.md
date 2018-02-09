@@ -9,7 +9,6 @@
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
 		<title>nano-g sample</title>
-		<link rel="stylesheet" href="style.css">
 	</head>
 	<body>
 		<script src="nano-g.min.js"></script>
@@ -50,8 +49,11 @@ draw('circle', {width: 30, height: 30, x: -100, y: 300});
 - `y`
 - `width`
 - `height`
-- `size` 텍스트 크기 (필수)
+- `flip_x` `true`/`false`
+- `flip_y` `true`/`false`
+- `size` 텍스트 크기 (텍스트인 경우 필수)
 - `font` 텍스트 폰트 이름
+- `style` 텍스트 스타일 (`'italic'`, `'bold'` 등)
 - `color`
 - `alpha`
 - `angle`
@@ -62,8 +64,8 @@ draw('circle', {width: 30, height: 30, x: -100, y: 300});
 대상으로는 파일 경로를 입력한다.
 
 다음과 같은 옵션들을 가진다.
-- `volume`
-- `loop`
+- `volume` 0~1 사이의 값
+- `loop` `true`/`false`
 
 ## `stop`
 무언가의 재생을 멈춘다.
@@ -103,8 +105,8 @@ draw('circle', {width: 30, height: 30, x: -100, y: 300});
 * `delta_time` 델타 타임
 * `window_width` 창의 너비
 * `window_height` 창의 높이
-* `mouse_x` 마우스 커서의 x 좌표 
-* `mouse_y` 마우스 커서의 y 좌표 
+* `mouse_x` 마우스 커서의 x 좌표
+* `mouse_y` 마우스 커서의 y 좌표
 
 ## 라이센스
 [MIT](LICENSE)

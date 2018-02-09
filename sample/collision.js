@@ -8,7 +8,7 @@ g(() => {
 	if (check_collision('circle_circle', {
 		width1: 150, height1: 150, x1: x1,
 		width2: 150, height2: 150, x2: x2
-	}) === true) {
+	})) {
 		color = 'red';
 	}
 	
