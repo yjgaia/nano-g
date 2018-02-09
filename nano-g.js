@@ -12,41 +12,77 @@
 	global.delta_time = 0;
 	global.window_width = document.documentElement.clientWidth;
 	global.window_height = global.innerHeight;
-	global.mouse_x = window_width / 2;
-	global.mouse_y = window_height / 2;
+	global.mouse_x = window_width / 2 * devicePixelRatio;
+	global.mouse_y = window_height / 2 * devicePixelRatio;
 	
 	// 캔버스 생성
 	let canvas = document.createElement('canvas');
 	let context = canvas.getContext('2d');
 	
-	canvas.width = window_width;
-	canvas.height = window_height;
+	canvas.width = window_width * devicePixelRatio;
+	canvas.height = window_height * devicePixelRatio;
 	
 	canvas.style.position = 'fixed';
 	canvas.style.left = 0;
 	canvas.style.top = 0;
 	canvas.style.zIndex = -1;
+	canvas.style.width = window_width + 'px';
+	canvas.style.height = window_height + 'px';
 	
 	document.body.appendChild(canvas);
 	
 	global.addEventListener('resize', () => {
 		global.window_width = document.documentElement.clientWidth;
 		global.window_height = global.innerHeight;
-		canvas.width = window_width;
-		canvas.height = window_height;
+		
+		canvas.width = window_width * devicePixelRatio;
+		canvas.height = window_height * devicePixelRatio;
+		
+		canvas.style.width = window_width + 'px';
+		canvas.style.height = window_height + 'px';
 	}, false);
 	
-	global.addEventListener('mousemove', (e) => {
-		global.mouse_x = e.clientX - window_width / 2;
-		global.mouse_y = e.clientY - window_height / 2;
-	}, false);
+	// 사운드 관련
+	
+	// audiocontext-polyfill.js
+	(function(window,undefined){"use strict";window.AudioContext=window.AudioContext||window.webkitAudioContext;if(window.AudioContext!==undefined){window.OfflineAudioContext=window.OfflineAudioContext||window.webkitOfflineAudioContext;var Proto=AudioContext.prototype;var tmpctx=new AudioContext;var isStillOld=function(normative,old){return normative===undefined&&old!==undefined};var bufProto=tmpctx.createBufferSource().constructor.prototype;if(isStillOld(bufProto.start,bufProto.noteOn)||isStillOld(bufProto.stop,bufProto.noteOff)){var nativeCreateBufferSource=Proto.createBufferSource;Proto.createBufferSource=function createBufferSource(){var returnNode=nativeCreateBufferSource.call(this);returnNode.start=returnNode.start||returnNode.noteOn;returnNode.stop=returnNode.stop||returnNode.noteOff;return returnNode}}if(typeof tmpctx.createOscillator==="function"){var oscProto=tmpctx.createOscillator().constructor.prototype;if(isStillOld(oscProto.start,oscProto.noteOn)||isStillOld(oscProto.stop,oscProto.noteOff)){var nativeCreateOscillator=Proto.createOscillator;Proto.createOscillator=function createOscillator(){var returnNode=nativeCreateOscillator.call(this);returnNode.start=returnNode.start||returnNode.noteOn;returnNode.stop=returnNode.stop||returnNode.noteOff;return returnNode}}}if(Proto.createGain===undefined&&Proto.createGainNode!==undefined){Proto.createGain=Proto.createGainNode}if(Proto.createDelay===undefined&&Proto.createDelayNode!==undefined){Proto.createDelay=Proto.createGainNode}if(Proto.createScriptProcessor===undefined&&Proto.createJavaScriptNode!==undefined){Proto.createScriptProcessor=Proto.createJavaScriptNode}var is_iOS=navigator.userAgent.indexOf("like Mac OS X")!==-1;if(is_iOS){var OriginalAudioContext=AudioContext;window.AudioContext=function AudioContext(){var iOSCtx=new OriginalAudioContext;var body=document.body;var tmpBuf=iOSCtx.createBufferSource();var tmpProc=iOSCtx.createScriptProcessor(256,1,1);body.addEventListener("touchstart",instantProcess,false);function instantProcess(){tmpBuf.start(0);tmpBuf.connect(tmpProc);tmpProc.connect(iOSCtx.destination)}tmpProc.onaudioprocess=function(){tmpBuf.disconnect();tmpProc.disconnect();body.removeEventListener("touchstart",instantProcess,false);tmpProc.onaudioprocess=null};return iOSCtx}}}})(window);
+	let audioContext = new AudioContext();
+	
+	// 이벤트 관련
+	
+	let setMousePosition = (e) => {
+		if (e.touches !== undefined && e.touches[0] !== undefined) {
+			global.mouse_x = e.touches[0].pageX - window_width / 2;
+			global.mouse_y = e.touches[0].pageY - window_height / 2;
+		} else {
+			global.mouse_x = e.pageX - window_width / 2;
+			global.mouse_y = e.pageY - window_height / 2;
+		}
+	};
 	
 	let isMouseDown = false;
 	global.addEventListener('mousedown', (e) => {
 		isMouseDown = true;
+		setMousePosition(e);
 	}, false);
 	global.addEventListener('mouseup', (e) => {
 		isMouseDown = false;
+		setMousePosition(e);
+	}, false);
+	global.addEventListener('mousemove', (e) => {
+		setMousePosition(e);
+	}, false);
+	
+	let isTouching = false;
+	global.addEventListener('touchstart', (e) => {
+		isTouching = true;
+		setMousePosition(e);
+	}, false);
+	global.addEventListener('touchend', (e) => {
+		if (e.touches.length === 0) {
+			isTouching = false;
+		}
+		setMousePosition(e);
 	}, false);
 	
 	let keyDowns = {};
@@ -65,7 +101,7 @@
 	};
 	
 	let images = {};
-	let audios = {};
+	let sounds = {};
 	
 	// 무언가를 그린다.
 	global.draw = (target, option) => {
@@ -165,26 +201,26 @@
 	
 	// 무언가를 재생시킨다.
 	global.play = (src, option) => {
-		if (audios[src] === undefined) {
-			audios[src] = new Audio();
+		if (sounds[src] === undefined) {
+			sounds[src] = new Audio();
 		}
-		audios[src].src = src;
+		sounds[src].src = src;
 		if (option !== undefined) {
 			if (option.loop !== undefined) {
-				audios[src].loop = option.loop;
+				sounds[src].loop = option.loop;
 			}
 			if (option.volume !== undefined) {
-				audios[src].volume = option.volume;
+				sounds[src].volume = option.volume;
 			}
 		}
-		audios[src].play();
+		sounds[src].play();
 	};
 	
 	// 무언가의 재생을 멈춘다.
 	global.stop = (src) => {
-		if (audios[src] !== undefined) {
-			audios[src].pause();
-			audios[src].currentTime = 0;
+		if (sounds[src] !== undefined) {
+			sounds[src].pause();
+			sounds[src].currentTime = 0;
 		}
 	};
 	
@@ -287,7 +323,7 @@
 	
 	// 게임으로의 입력을 체크한다.
 	global.check_input = (target) => {
-		if (target === 'mouse' && isMouseDown === true) {
+		if (target === 'mouse' && (isMouseDown === true || isTouching === true)) {
 			return true;
 		} else {
 			return keyDowns[target];
