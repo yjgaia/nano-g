@@ -12,7 +12,7 @@
 		<link rel="stylesheet" href="style.css">
 	</head>
 	<body>
-		<script src="nano-g.js"></script>
+		<script src="nano-g.min.js"></script>
 		<script src="game.js"></script>
 	</body>
 </html>
