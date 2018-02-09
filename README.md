@@ -74,17 +74,18 @@ draw('circle', {width: 30, height: 30, x: -100, y: 300});
 충돌을 체크한다.
 
 다음과 같은 대상들을 가진다.
+- `'point_rect'`
+- `'point_circle'`
 - `'rect_rect'`
-- `'circle_circle'`
 - `'rect_circle'`
-- `'circle_rect'`
+- `'circle_circle'`
 
 다음과 같은 옵션들을 가진다.
 - `x1`
 - `y1`
-- `width1`
-- `height1`
-- `angle1`
+- `width1` (`'point_rect'`/`'point_circle'`는 필요 없음)
+- `height1` (`'point_rect'`/`'point_circle'`는 필요 없음)
+- `angle1` (`'point_rect'`/`'point_circle'`는 필요 없음)
 - `x2`
 - `y2`
 - `width2`
@@ -95,9 +96,8 @@ draw('circle', {width: 30, height: 30, x: -100, y: 300});
 게임으로의 입력을 체크한다.
 
 다음과 같은 대상들을 가진다.
-- `'mouse_left'` 마우스 왼클릭
-- `'mouse_right'` 마우스 오른클릭
-- 키보드 키 값
+- `'mouse'` 마우스 클릭
+- 키보드 키 값 (`'a'`, `'b'`, `'c'`, `'enter'` 등)
 
 ## 변수
 * `delta_time` 델타 타임
