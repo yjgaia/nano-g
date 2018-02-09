@@ -1,3 +1,10 @@
+/*!
+ * nano-g v0.1
+ * https://github.com/Hanul/nano-g
+ *
+ * Released under the MIT license
+ * https://github.com/Hanul/nano-g/blob/master/LICENSE
+ */
 (() => {
 	let global = window;
 	
