@@ -10,37 +10,70 @@
 	
 	// 변수들
 	global.delta_time = 0;
-	global.window_width = document.documentElement.clientWidth;
-	global.window_height = global.innerHeight;
-	global.mouse_x = window_width / 2 * devicePixelRatio;
-	global.mouse_y = window_height / 2 * devicePixelRatio;
+	global.game_width = undefined;
+	global.game_height = undefined;
+	global.canvas_width = undefined;
+	global.canvas_height = undefined;
+	global.canvas_ratio = undefined;
 	
 	// 캔버스 생성
 	let canvas = document.createElement('canvas');
 	let context = canvas.getContext('2d');
 	
-	canvas.width = window_width * devicePixelRatio;
-	canvas.height = window_height * devicePixelRatio;
-	
 	canvas.style.position = 'fixed';
-	canvas.style.left = 0;
-	canvas.style.top = 0;
 	canvas.style.zIndex = -1;
-	canvas.style.width = window_width + 'px';
-	canvas.style.height = window_height + 'px';
 	
 	document.body.appendChild(canvas);
 	
-	global.addEventListener('resize', () => {
+	let resize = () => {
+		
 		global.window_width = document.documentElement.clientWidth;
 		global.window_height = global.innerHeight;
 		
-		canvas.width = window_width * devicePixelRatio;
-		canvas.height = window_height * devicePixelRatio;
+		if (game_width !== undefined) {
+			canvas_width = game_width;
+		} else {
+			canvas_width = window_width;
+		}
 		
-		canvas.style.width = window_width + 'px';
-		canvas.style.height = window_height + 'px';
-	}, false);
+		if (game_height !== undefined) {
+			canvas_height = game_height;
+		} else {
+			canvas_height = window_height;
+		}
+		
+		let widthRatio = window_width / canvas_width;
+		let heightRatio = window_height / canvas_height;
+		
+		if (widthRatio < heightRatio) {
+			canvas_ratio = widthRatio;
+		} else {
+			canvas_ratio = heightRatio;
+		}
+		
+		if (game_width === undefined) {
+			canvas_width /= canvas_ratio;
+		}
+		
+		if (game_height === undefined) {
+			canvas_height /= canvas_ratio;
+		}
+		
+		canvas.style.width = (canvas_width * canvas_ratio) + 'px';
+		canvas.style.height = (canvas_height * canvas_ratio) + 'px';
+		
+		canvas.style.left = (window_width - canvas_width * canvas_ratio) / 2 + 'px';
+		canvas.style.top = (window_height - canvas_height * canvas_ratio) / 2 + 'px';
+		
+		canvas.width = canvas_width * devicePixelRatio;
+		canvas.height = canvas_height * devicePixelRatio;
+		
+		global.mouse_x = window_width / 2 * devicePixelRatio / canvas_ratio;
+		global.mouse_y = window_height / 2 * devicePixelRatio / canvas_ratio;
+	};
+	
+	resize();
+	global.addEventListener('resize', resize, false);
 	
 	// 사운드 관련
 	
@@ -52,11 +85,11 @@
 	
 	let setMousePosition = (e) => {
 		if (e.touches !== undefined && e.touches[0] !== undefined) {
-			global.mouse_x = e.touches[0].pageX - window_width / 2;
-			global.mouse_y = e.touches[0].pageY - window_height / 2;
+			global.mouse_x = (e.touches[0].pageX - window_width / 2) / canvas_ratio;
+			global.mouse_y = (e.touches[0].pageY - window_height / 2) / canvas_ratio;
 		} else {
-			global.mouse_x = e.pageX - window_width / 2;
-			global.mouse_y = e.pageY - window_height / 2;
+			global.mouse_x = (e.pageX - window_width / 2) / canvas_ratio;
+			global.mouse_y = (e.pageY - window_height / 2) / canvas_ratio;
 		}
 	};
 	
@@ -101,7 +134,8 @@
 	};
 	
 	let images = {};
-	let sounds = {};
+	let audioSources = {};
+	let audioGainNodes = {};
 	
 	// 무언가를 그린다.
 	global.draw = (target, option) => {
@@ -201,26 +235,66 @@
 	
 	// 무언가를 재생시킨다.
 	global.play = (src, option) => {
-		if (sounds[src] === undefined) {
-			sounds[src] = new Audio();
-		}
-		sounds[src].src = src;
-		if (option !== undefined) {
-			if (option.loop !== undefined) {
-				sounds[src].loop = option.loop;
-			}
-			if (option.volume !== undefined) {
-				sounds[src].volume = option.volume;
-			}
-		}
-		sounds[src].play();
+		
+		let request = new XMLHttpRequest();
+		request.open('GET', src, true);
+		request.responseType = 'arraybuffer';
+	
+		request.onload = () => {
+	
+			audioContext.decodeAudioData(request.response, (buffer) => {
+				
+				if (audioSources[src] !== undefined) {
+					stop(src);
+				}
+				
+				audioSources[src] = source = audioContext.createBufferSource();
+				audioGainNodes[src] = gainNode = audioContext.createGain();
+	
+				gainNode.connect(audioContext.destination);
+				gainNode.gain.setTargetAtTime(option !== undefined && option.volume !== undefined ? option.volume : 0.8, 0, 0);
+	
+				source.buffer = buffer;
+				source.connect(gainNode);
+				if (option !== undefined && option.loop !== undefined) {
+					source.loop = option.loop;
+				}
+				
+				source.start(0, 0);
+				
+				delayed = undefined;
+				
+				if (option !== undefined && option.loop !== true) {
+					source.onended = () => {
+						
+						source.stop(0);
+						source.disconnect();
+						source = undefined;
+	
+						gainNode.disconnect();
+						gainNode = undefined;
+	
+						buffer = undefined;
+						delayed = undefined;
+					};
+				}
+			});
+		};
+		request.send();
 	};
 	
 	// 무언가의 재생을 멈춘다.
 	global.stop = (src) => {
-		if (sounds[src] !== undefined) {
-			sounds[src].pause();
-			sounds[src].currentTime = 0;
+		
+		source = audioSources[src];
+		gainNode = audioGainNodes[src];
+		
+		if (source !== undefined) {
+			
+			source.stop(0);
+			source.disconnect();
+
+			gainNode.disconnect();
 		}
 	};
 	
@@ -331,9 +405,14 @@
 	};
 	
 	// 프레임마다 실행
-	let beforeTime = performance.now() / 1000;
+	let beforeTime;
 	let step;
 	requestAnimationFrame(step = (now) => {
+		
+		if (beforeTime === undefined) {
+			beforeTime = performance.now() / 1000;
+			resize();
+		}
 		
 		let time = now / 1000;
 		delta_time = time - beforeTime;
@@ -346,10 +425,10 @@
 			beforeTime = time;
 			
 			// 화면 초기화
-			context.clearRect(0, 0, window_width * devicePixelRatio, window_height * devicePixelRatio);
+			context.clearRect(0, 0, canvas_width * devicePixelRatio, canvas_height * devicePixelRatio);
 			context.save();
 			context.scale(devicePixelRatio, devicePixelRatio);
-			context.translate(window_width / 2, window_height / 2);
+			context.translate(canvas_width / 2, canvas_height / 2);
 			
 			logics.forEach((logic) => {
 				logic();
